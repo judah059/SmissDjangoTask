@@ -2,6 +2,8 @@ version: '3.8'
 services:
   pg_db:
       image: postgres
+      volumes:
+        - ./usr/lib/postgresql
       restart: always
       environment:
         - POSTGRES_NAME=newdb
@@ -19,7 +21,6 @@ services:
        environment:
            - SECRET_KEY='django-insecure-pg+h99q6^$aksy$mtmdmz3)keh3t^+-r_lkta478^_lc1w5+l8'
            - DEBUG=1
-           - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
            - POSTGRES_NAME=newdb
            - POSTGRES_USER=newuser
            - POSTGRES_PASSWORD='1'
