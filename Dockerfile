@@ -1,5 +1,6 @@
-FROM python:3-alpine
+FROM python:3
+ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED 1
-WORKDIR /forDjango/task_project
-ADD . ./forDjango/task_project
+WORKDIR /code
 RUN pip freeze > requirements.txt
+ADD . /code/

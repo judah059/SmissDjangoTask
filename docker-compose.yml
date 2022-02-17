@@ -11,9 +11,9 @@ services:
         - ${POSTGRES_PORT:-5433}:5432
   web:
        build: .
-       depends_on:
-           - pg_db
        command: python manage.py runserver 0.0.0.0:8000
+       volumes:
+           - .:/code
        ports:
            - "8000:8000"
        environment:
@@ -23,3 +23,6 @@ services:
            - POSTGRES_NAME=newdb
            - POSTGRES_USER=newuser
            - POSTGRES_PASSWORD='1'
+
+       depends_on:
+           - pg_db
