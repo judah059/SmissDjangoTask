@@ -74,8 +74,22 @@ class DepartmentsModelViewSet(ModelViewSet):
         else:
             return DepartmentsGetSerializer
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        name = self.request.GET.get('name')
+        if name:
+            return qs.filter(name__icontains=name)
+        return qs.all().order_by('name')
+
 
 class OrganizationsModelViewSet(ModelViewSet):
     queryset = Organizations.objects.all()
     serializer_class = OrganizationsSerializer
     permission_classes = [IsAdminOrReadOnly]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        name = self.request.GET.get('name')
+        if name:
+            return qs.filter(name__icontains=name)
+        return qs.all().order_by('-name')
