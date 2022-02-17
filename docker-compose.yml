@@ -6,9 +6,9 @@ services:
         - ./usr/lib/postgresql
       restart: always
       environment:
-        - POSTGRES_NAME=newdb
+        - POSTGRES_DB=newdb
         - POSTGRES_USER=newuser
-        - POSTGRES_PASSWORD='1'
+        - POSTGRES_PASSWORD=1
       ports:
         - ${POSTGRES_PORT:-5433}:5432
   web:
@@ -23,6 +23,6 @@ services:
            - DEBUG=1
            - POSTGRES_NAME=newdb
            - POSTGRES_USER=newuser
-           - POSTGRES_PASSWORD='1'
+           - POSTGRES_PASSWORD=1
        depends_on:
            - pg_db
