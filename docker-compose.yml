@@ -23,6 +23,5 @@ services:
            - POSTGRES_NAME=newdb
            - POSTGRES_USER=newuser
            - POSTGRES_PASSWORD='1'
-
        depends_on:
            - pg_db
