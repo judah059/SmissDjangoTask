@@ -3,7 +3,7 @@ services:
   pg_db:
       image: postgres
       volumes:
-        - ./usr/lib/postgresql
+        - postgres_data:/var/lib/postgresql/data/
       restart: always
       environment:
         - POSTGRES_DB=newdb
@@ -21,8 +21,53 @@ services:
        environment:
            - SECRET_KEY='django-insecure-pg+h99q6^$aksy$mtmdmz3)keh3t^+-r_lkta478^_lc1w5+l8'
            - DEBUG=1
-           - POSTGRES_NAME=newdb
+           - POSTGRES_DB=newdb
            - POSTGRES_USER=newuser
            - POSTGRES_PASSWORD=1
+           - BROKER_URL="redis://redis:6379/0"
+           - RESULT_BACKEND="redis://redis:6379/0"
        depends_on:
            - pg_db
+           - redis
+  redis:
+       image: "redis:alpine"
+#       command: redis-server
+       ports:
+         - "6379:6379"
+#       volumes:
+#         - $PWD/redis-data:/var/lib/redis
+#         - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
+#       environment:
+#         - REDIS_REPLICATION_MODE=master
+#       networks:
+#         node_net:
+#           ipv4_address: 172.28.1.4
+  celery:
+       restart: always
+       build: .
+       command: celery -A task_project worker --loglevel=INFO
+       volumes:
+         - .:/code
+       environment:
+         - SECRET_KEY='django-insecure-pg+h99q6^$aksy$mtmdmz3)keh3t^+-r_lkta478^_lc1w5+l8'
+         - POSTGRES_DB=newdb
+         - POSTGRES_USER=newuser
+         - POSTGRES_PASSWORD=1
+#         - BROKER_URL="redis://redis:6379/0"
+#         - RESULT_BACKEND="redis://redis:6379/0"
+       depends_on:
+         - redis
+         - web
+  celery-beat:
+       build: .
+       command: celery -A task_project beat --loglevel=INFO
+       volumes:
+         - .:/code
+       environment:
+         - SECRET_KEY='django-insecure-pg+h99q6^$aksy$mtmdmz3)keh3t^+-r_lkta478^_lc1w5+l8'
+       depends_on:
+         - redis
+
+
+volumes:
+  postgres_data:

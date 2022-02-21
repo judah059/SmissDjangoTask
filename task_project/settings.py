@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'taskapp',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'taskapp.middlewares.CollectRequestsMiddleware'
 ]
 
 ROOT_URLCONF = 'task_project.urls'
@@ -138,10 +140,15 @@ REST_FRAMEWORK = {
     ]
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# EMAIL_HOST = ''
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'temp_user@temp.temp'
-# EMAIL_HOST_PASSWORD = 'temp_password'
-DEFAULT_FROM_EMAIL = 'temp_user@temp.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'pohrebniakdanil467@gmail.com'
+EMAIL_HOST_PASSWORD = 'kuklus12345_'
+# DEFAULT_FROM_EMAIL = 'temp_user@temp.com'
+
+BROKER_URL = os.environ.get('BROKER_URL', 'redis://redis:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get('RESULT_BACKEND', 'redis://redis:6379/0')
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

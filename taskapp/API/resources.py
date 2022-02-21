@@ -1,4 +1,4 @@
-from django.conf import settings
+
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -33,7 +33,7 @@ class CustomAuthToken(ObtainAuthToken):
         res = send_mail(
             'Token',
             token.key,
-            settings.DEFAULT_FROM_EMAIL,
+            settings.EMAIL_HOST_USER,
             [user.email,],
             fail_silently=False
         )

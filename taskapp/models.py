@@ -22,4 +22,9 @@ class Employees(models.Model):
     department = models.ForeignKey(Departments, on_delete=models.CASCADE)
 
 
+class EmployeesRequest(models.Model):
+    count = models.IntegerField(default=0)
+    average_time = models.CharField(max_length=120, default=0)
+    name = models.CharField(max_length=100)
+    sum_time = models.DecimalField(max_digits=12, decimal_places=3, default=0)
 # Create your models here.
