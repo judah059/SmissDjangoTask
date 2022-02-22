@@ -8,9 +8,12 @@ class CollectRequestsMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if request.path == '/api/employees/':
             request.session['start'] = datetime.datetime.now().isoformat()
-            erc = EmployeesRequest.objects.get(name='employee_req_counter')
-            erc.count += 1
-            erc.save()
+            try:
+                erc = EmployeesRequest.objects.get(name='employee_req_counter')
+                erc.count += 1
+                erc.save()
+            except Exception:
+                EmployeesRequest.objects.create(name='employee_req_counter', count=1)
             print(request.session['start'])
 
     def process_response(self, request, response):
