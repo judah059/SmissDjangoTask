@@ -46,7 +46,6 @@ class OrganizationsSerializer(ModelSerializer):
 
 class DepartmentsGetSerializer(ModelSerializer):
     organization = OrganizationsSerializer()
-    total_count = serializers.SerializerMethodField()
     total_employees_count = serializers.SerializerMethodField()
 
     class Meta:

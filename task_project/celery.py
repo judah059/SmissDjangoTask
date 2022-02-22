@@ -17,7 +17,7 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.beat_schedule = {
     'send_report_every_hour': {
         'task': 'taskapp.tasks.send_requests_count',
-        'schedule': crontab(),
+        'schedule': crontab(hour=1),
     },
 }
 
