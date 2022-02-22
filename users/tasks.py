@@ -1,7 +1,7 @@
 from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
-from .models import EmployeesRequest
+from employees.models import EmployeesRequest
 from django.conf import settings
 
 

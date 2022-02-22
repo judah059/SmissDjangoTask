@@ -1,32 +1,7 @@
-from dataclasses import field, fields
-import email
-from functools import total_ordering
 from rest_framework import serializers
-from taskapp.models import CustomUser, Employees, Organizations, Departments
+from employees.models import Employees, Organizations, Departments
 from rest_framework.serializers import ModelSerializer
-from rest_framework.authtoken.serializers import AuthTokenSerializer
-from django.contrib.auth import get_user_model
-from django.db.models import Sum, Count
-
-UserModel = get_user_model()
-
-
-class CustomUserGetSerializer(ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ('first_name', 'last_name', 'username', )
-
-
-class CustomUserPostSerializer(ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
-    def create(self, validated_data):
-        user = UserModel.objects.create_user(username=validated_data['username'], email=validated_data['email'], password=validated_data['password'])
-        return user
-
-    class Meta:
-        model = UserModel
-        fields = ('first_name', 'last_name', 'username', 'email', 'password')
+from api.users.serializers import CustomUserGetSerializer
 
 
 class OrganizationsSerializer(ModelSerializer):
@@ -78,4 +53,3 @@ class EmployeesPostPutPatchSerializer(ModelSerializer):
     class Meta:
         model = Employees
         fields = ('user', 'status', 'department')
-
