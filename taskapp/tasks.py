@@ -7,16 +7,16 @@ from django.conf import settings
 
 @shared_task
 def send_requests_count():
-    for user in get_user_model().objects.all():
-        if user.is_superuser:
-            print(user.email, 'im here')
-            print(f'Count: {EmployeesRequest.objects.last().count}, Average time of request in microseconds: '
-                  f'{EmployeesRequest.objects.last().average_time}')
-            send_mail(
-                'Report',
-                f'Count: {EmployeesRequest.objects.last().count}, Average time of request: '
-                f'{EmployeesRequest.objects.last().average_time}',
-                settings.EMAIL_HOST_USER,
-                [user.email, ],
-                fail_silently=False
-            )
+    admins = get_user_model().objects.filter(is_superuser=True)
+    for admin in admins:
+        print(admin.email, 'im here')
+        print(f'Count: {EmployeesRequest.objects.last().count}, Average time of request in microseconds: '
+                f'{EmployeesRequest.objects.last().average_time}')
+        send_mail(
+            'Report',
+            f'Count: {EmployeesRequest.objects.last().count}, Average time of request: '
+            f'{EmployeesRequest.objects.last().average_time}',
+            settings.EMAIL_HOST_USER,
+            [admin.email, ],
+            fail_silently=False
+        )

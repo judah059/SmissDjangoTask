@@ -1,30 +1,25 @@
 import datetime
-
 from django.utils.deprecation import MiddlewareMixin
 from .models import EmployeesRequest
+from django.db.models import F
 
 
 class CollectRequestsMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if request.path == '/api/employees/':
             request.session['start'] = datetime.datetime.now().isoformat()
-            try:
-                erc = EmployeesRequest.objects.get(name='employee_req_counter')
-                erc.count += 1
-                erc.save()
-            except Exception:
-                EmployeesRequest.objects.create(name='employee_req_counter', count=1)
-            print(request.session['start'])
+            obj, create = EmployeesRequest.objects.get_or_create(name='employee_req_counter')
+            obj.count = F('count') + 1
+            obj.save()
 
     def process_response(self, request, response):
         if request.path == '/api/employees/':
             start_time = request.session.get('start')
             res = datetime.datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S.%f')
             delta = (datetime.datetime.now() - res).microseconds
-            erc = EmployeesRequest.objects.get(name='employee_req_counter')
-            erc.sum_time += delta
-            erc.average_time = erc.sum_time / erc.count
-            erc.save()
+            obj = EmployeesRequest.objects.filter(name='employee_req_counter')
+            obj.update(sum_time=F('sum_time')+delta)
+            obj.update(average_time=F('sum_time')/F('count'))
         return response
 
 
