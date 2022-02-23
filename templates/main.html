@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+</head>
+<body>
+<p>
+    Enter the room: <br>
+</p>
+<input id="room-name" type="text" size="120">
+<input id="room-name-submit" type="button" value="Enter">
+
+<script>
+    document.querySelector('#room-name').onkeyup = function (e) {
+        if (e.keyCode === 13) {
+            document.querySelector('#room-name-submit').click();
+        }
+    };
+
+    document.querySelector('#room-name-submit').onclick = function (e) {
+        var roomName = document.querySelector('#room-name').value;
+        window.location.pathname = '/chat/' + roomName + '/';
+    };
+</script>
+</body>
+</html>
