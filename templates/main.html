@@ -8,20 +8,13 @@
 <p>
     Enter the room: <br>
 </p>
-<input id="room-name" type="text" size="120">
-<input id="room-name-submit" type="button" value="Enter">
-
-<script>
-    document.querySelector('#room-name').onkeyup = function (e) {
-        if (e.keyCode === 13) {
-            document.querySelector('#room-name-submit').click();
-        }
-    };
-
-    document.querySelector('#room-name-submit').onclick = function (e) {
-        var roomName = document.querySelector('#room-name').value;
-        window.location.pathname = '/chat/' + roomName + '/';
-    };
-</script>
+<form method="post" action="{% url 'chat-create' %}">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" id="room-name-submit" value="Create room">
+</form>
+{% for obj in object_list %}
+{{ obj.room_name }}
+{% endfor %}
 </body>
 </html>
