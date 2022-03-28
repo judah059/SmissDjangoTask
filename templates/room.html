@@ -12,7 +12,7 @@
 {{ room_name|json_script:"room-name" }}
 <script src="{% static 'reconnecting-websocket.js' %}"></script>
 <script>
-    var roomName = JSON.parse(document.getElementById('room-name').textContent);
+    var roomName = {{ view.kwargs.room_name }}
     var userName = {{ username }}
     const chatSocket = new ReconnectingWebSocket(
         'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
@@ -35,8 +35,7 @@
         chatSocket.send(JSON.stringify({
             'message': message,
             'command': 'new_message',
-            'from': userName,
-            'room': roomName
+            'from': userName
 
         }));
         messageInputDom.value = '';

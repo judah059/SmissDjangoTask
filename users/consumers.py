@@ -1,4 +1,6 @@
 import json
+
+from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import ChatMessage, ChatRoom, CustomUser
 
@@ -6,18 +8,18 @@ from .models import ChatMessage, ChatRoom, CustomUser
 class ChatConsumer(AsyncWebsocketConsumer):
 
     async def fetch_message(self, data):
-        messages = ChatMessage.objects.filter(chat__room_name=data['room'])
+        messages = sync_to_async(ChatMessage.objects.filter)(chat__room_name=data['room'])
         content = {
             'messages': self.messages_to_json(messages)
         }
         await self.send_chat_message(content)
 
     async def new_message(self, data):
-        author = data['from']
-        room = data['room']
-        author_user = CustomUser.objects.filter(username=author)[0]
-        current_room = ChatRoom.objects.filter(room_name=room)
-        message = ChatMessage.objects.create(
+        author = self.scope['user']
+        room = self.scope['url_route']['kwargs']['room_name']
+        author_user = sync_to_async(CustomUser.objects.filter)(username=author)
+        current_room = sync_to_async(ChatRoom.objects.filter)(room_name=room)
+        message = sync_to_async(ChatMessage.objects.create)(
             content=data['message'],
             author=author_user,
             chat=current_room
@@ -64,9 +66,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-    def receive(self, text_data):
+    async def receive(self, text_data):
         data = json.loads(text_data)
-        self.commands[data['command']](self, data)
+        await self.commands[data['command']](self, data)
 
     async def send_chat_message(self, message):
         await self.channel_layer.group_send(
