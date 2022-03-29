@@ -16,8 +16,8 @@
 {{ room_name|json_script:"room-name" }}
 <script src="{% static 'reconnecting-websocket.js' %}"></script>
 <script>
-    var roomName = {{ view.kwargs.room_name }}
-    const chatSocket = new ReconnectingWebSocket(
+    var roomName = {{ room_name }}
+    var chatSocket = new ReconnectingWebSocket(
         'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
     );
 

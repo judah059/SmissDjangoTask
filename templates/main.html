@@ -14,7 +14,7 @@
     <input type="submit" id="room-name-submit" value="Create room">
 </form>
 {% for obj in object_list %}
-{{ obj.room_name }}
+<a href="{% url 'room' obj.room_name %}"> {{ obj.room_name }} </a> <br>
 {% endfor %}
 </body>
 </html>

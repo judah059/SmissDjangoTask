@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth.views import LoginView
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView, CreateView, ListView
@@ -31,21 +32,22 @@ class ChatRoomListView(ListView):
     template_name = 'main.html'
     extra_context = {'form': ChatRoomCreationForm()}
 
-
-# class Room(TemplateView):
-#     template_name = 'room.html'
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data()
-#         context['username'] = mark_safe(json.dumps(self.request.user.username))
-#         context['messages'] = ChatMessage.objects.filter(chat__room_name=self.kwargs['room_name'])
-#         return context
+    def get_queryset(self):
+        qs = super().get_queryset()
+        first_owner = Q(first_user=self.request.user)
+        second_owner = Q(second_user=self.request.user)
+        return qs.filter(first_owner | second_owner)
 
 
 class Room(ListView):
     model = ChatMessage
     template_name = 'room.html'
     paginate_by = 15
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['room_name'] = mark_safe(json.dumps(self.kwargs['room_name']))
+        return context
 
     def get_queryset(self):
         qs = super().get_queryset()
