@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView, CreateView, ListView
 from .forms import ChatRoomCreationForm, CustomUserCreationForm
-from .models import ChatRoom
+from .models import ChatRoom, ChatMessage
 
 
 # class MainPaige(TemplateView):
@@ -32,13 +32,24 @@ class ChatRoomListView(ListView):
     extra_context = {'form': ChatRoomCreationForm()}
 
 
-class Room(TemplateView):
-    template_name = 'room.html'
+# class Room(TemplateView):
+#     template_name = 'room.html'
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data()
+#         context['username'] = mark_safe(json.dumps(self.request.user.username))
+#         context['messages'] = ChatMessage.objects.filter(chat__room_name=self.kwargs['room_name'])
+#         return context
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['username'] = mark_safe(json.dumps(self.request.user.username))
-        return context
+
+class Room(ListView):
+    model = ChatMessage
+    template_name = 'room.html'
+    paginate_by = 15
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(chat__room_name=self.kwargs['room_name']).order_by('created_at')
 
 
 class Login(LoginView):

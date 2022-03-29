@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from asgiref.sync import sync_to_async, async_to_sync
@@ -7,30 +8,24 @@ from .models import ChatMessage, ChatRoom, CustomUser
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
-    async def fetch_message(self, data):
-        messages = sync_to_async(ChatMessage.objects.filter)(chat__room_name=data['room'])
-        content = {
-            'messages': self.messages_to_json(messages)
-        }
-        await self.send_chat_message(content)
 
     async def new_message(self, data):
         author = self.scope['user']
         room = self.scope['url_route']['kwargs']['room_name']
-        author_user = sync_to_async(CustomUser.objects.filter)(username=author.username)
-        current_room = sync_to_async(ChatRoom.objects.filter)(room_name=room)
-        message = ChatMessage(
-            content=data['message'],
-            author=author_user,
-            chat=current_room
-        )
-        print('!!! ', message.content, ' !!!')
+        author_user = await sync_to_async(CustomUser.objects.get)(username=author.username)
+        current_room = await sync_to_async(ChatRoom.objects.get)(room_name=room)
+        print('aaaaaaaaaaa')
+        message = await sync_to_async(ChatMessage)(content=data['message'], author=author_user, chat=current_room)
+        print('hellooo')
         content = {
             'command': 'new_message',
             'message': self.message_to_json(message)
         }
-        sync_to_async(message.save)()
+        print('im here!!!!!!!')
+        await sync_to_async(message.save)()
+        print('hiiiii', datetime.datetime.now())
         await self.send_chat_message(content)
+        print('the end)')
 
     def messages_to_json(self, messages):
         result = []
@@ -40,13 +35,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     def message_to_json(self, message):
         return {
-            'result': {
-                'chat': message.chat
-            }
+            'content': message.content,
+            'author': message.author.username,
+            'chat': message.chat.room_name,
+            'created_at': str(message.created_at)
         }
 
     commands = {
-        'fetch_message': fetch_message,
         'new_message': new_message
     }
 
@@ -72,11 +67,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.commands[data['command']](self, data)
 
     async def send_chat_message(self, message):
+        print(message)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': message
+                'message': message,
             }
         )
 
