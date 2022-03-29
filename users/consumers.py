@@ -1,6 +1,6 @@
 import json
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import ChatMessage, ChatRoom, CustomUser
 
@@ -17,17 +17,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def new_message(self, data):
         author = self.scope['user']
         room = self.scope['url_route']['kwargs']['room_name']
-        author_user = sync_to_async(CustomUser.objects.filter)(username=author)
+        author_user = sync_to_async(CustomUser.objects.filter)(username=author.username)
         current_room = sync_to_async(ChatRoom.objects.filter)(room_name=room)
-        message = sync_to_async(ChatMessage.objects.create)(
+        message = ChatMessage(
             content=data['message'],
             author=author_user,
             chat=current_room
         )
+        print('!!! ', message.content, ' !!!')
         content = {
             'command': 'new_message',
             'message': self.message_to_json(message)
         }
+        sync_to_async(message.save)()
         await self.send_chat_message(content)
 
     def messages_to_json(self, messages):
@@ -38,10 +40,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     def message_to_json(self, message):
         return {
-            'chat': message.chat,
-            'author': message.author,
-            'content': message.content,
-            'created_at': str(message.created_at)
+            'result': {
+                'chat': message.chat
+            }
         }
 
     commands = {
