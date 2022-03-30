@@ -3,12 +3,11 @@ import json
 
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import ChatMessage, ChatRoom, CustomUser
+from chat.models import ChatMessage, ChatRoom
+from users.models import CustomUser
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
-
-
     async def new_message(self, data):
         author = self.scope['user']
         room = self.scope['url_route']['kwargs']['room_name']

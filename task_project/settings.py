@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'employees',
     'channels',
+    'chat',
 
 ]
 
